@@ -1,10 +1,14 @@
+version: '3.8'
+
 services:
   api-nest:
     build:
       context: ./backend/api-nest
     container_name: mi-nestjs-container
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
-      DATABASE_URL: postgres://postgres:postgres@54.234.149.220:5432/usuario
+      DATABASE_URL: postgres://postgres:postgres@host.docker.internal:5432/usuario
     ports:
       - "3000:3000"
     networks:
@@ -14,14 +18,16 @@ services:
     build:
       context: ./backend/api-fiber
     container_name: mi-go-container
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
-      DB_HOST: 54.234.149.220
+      DB_HOST: host.docker.internal
       DB_PORT: 3306
       DB_USER: root
       DB_PASSWORD: mi_password
       DB_NAME: cursos
       GOOSE_DRIVER: mysql
-      GOOSE_DBSTRING: root:mi_password@tcp(54.234.149.220:3306)/cursos?parseTime=true&charset=utf8mb4&collation=utf8mb4_unicode_ci
+      GOOSE_DBSTRING: root:mi_password@tcp(host.docker.internal:3306)/cursos?parseTime=true&charset=utf8mb4&collation=utf8mb4_unicode_ci
       GOOSE_MIGRATION_DIR: ./database/migrations
       GOOSE_TABLE: custom.goose_migrations
     ports:
@@ -33,8 +39,10 @@ services:
     build:
       context: ./backend/api-fast
     container_name: mi-fastapi-container
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
-      MONGO_URL: mongodb://54.234.149.220:27017
+      MONGO_URL: mongodb://host.docker.internal:27017
     ports:
       - "8080:80"
     networks:
@@ -44,6 +52,8 @@ services:
     build:
       context: ./backend/api-orquestador
     container_name: orquestador
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       USUARIOS_SERVICE_URL: http://api-nest:3000
       CURSOS_SERVICE_URL: http://api-go:8070
